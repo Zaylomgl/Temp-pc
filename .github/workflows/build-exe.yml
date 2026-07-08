@@ -1,0 +1,44 @@
+name: Build tempmon.exe
+
+# Génère un exécutable Windows autonome (tempmon.exe) qu'un utilisateur
+# peut télécharger et double-cliquer, sans installer Python.
+#
+# - À chaque tag "v*" : publie tempmon.exe dans la Release.
+# - Manuellement (bouton "Run workflow") : dépose l'exe en artefact.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer PyInstaller
+        run: pip install pyinstaller
+
+      - name: Construire l'exécutable
+        run: >
+          pyinstaller --onefile --name tempmon
+          --add-data "tempmon/web;tempmon/web"
+          launcher.py
+
+      - name: Publier l'artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tempmon-windows
+          path: dist/tempmon.exe
+
+      - name: Attacher à la Release (sur tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/tempmon.exe
