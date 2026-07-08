@@ -55,7 +55,7 @@ def build_parser() -> argparse.ArgumentParser:
                    help=f"Hôte du serveur (défaut: {DEFAULT_HOST}).")
     p.add_argument("--port", type=int, default=DEFAULT_PORT,
                    help=f"Port du serveur (défaut: {DEFAULT_PORT}).")
-    p.add_argument("--source", choices=["hwmon", "psutil", "simulated"],
+    p.add_argument("--source", choices=["hwmon", "psutil", "windows_wmi", "simulated"],
                    help="Forcer une source de capteurs.")
     p.add_argument("--no-color", action="store_true",
                    help="Désactiver les couleurs.")

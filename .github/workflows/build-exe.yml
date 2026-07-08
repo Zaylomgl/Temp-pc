@@ -25,8 +25,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Installer PyInstaller
-        run: pip install pyinstaller
+      - name: Installer PyInstaller et les dépendances Windows
+        run: pip install pyinstaller wmi pywin32
 
       - name: Construire l'exécutable
         run: >

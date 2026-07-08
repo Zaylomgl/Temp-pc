@@ -10,6 +10,11 @@ from tempmon.model import Reading, SensorGroup, Snapshot, Status  # noqa: E402
 from tempmon.sensors.hwmon import _classify, _parse_chip  # noqa: E402
 from tempmon.sensors.registry import build_provider  # noqa: E402
 from tempmon.sensors.simulated import SimulatedProvider  # noqa: E402
+from tempmon.sensors.windows_wmi import (  # noqa: E402
+    WindowsWmiProvider,
+    _classify as _classify_wmi,
+    _kelvin_tenths_to_celsius,
+)
 
 
 class TestStatus(unittest.TestCase):
@@ -82,6 +87,23 @@ class TestSimulatedProvider(unittest.TestCase):
         for g in snap.groups:
             for r in g.readings:
                 self.assertIsNotNone(r.celsius)
+
+
+class TestWindowsWmiProvider(unittest.TestCase):
+    def test_kelvin_tenths_conversion(self):
+        # 293.15 K (20 °C) -> stocké par WMI comme 2931.5 (dixièmes de Kelvin).
+        self.assertAlmostEqual(_kelvin_tenths_to_celsius(2931.5), 20.0, places=2)
+
+    def test_classify(self):
+        self.assertEqual(_classify_wmi("CPUZ"), "cpu")
+        self.assertEqual(_classify_wmi("GPU0"), "gpu")
+        self.assertEqual(_classify_wmi("TZ00"), "board")
+
+    def test_unavailable_without_wmi_module(self):
+        provider = WindowsWmiProvider()
+        # Dans cet environnement (Linux, sans le module wmi), doit se
+        # déclarer indisponible plutôt que lever une exception.
+        self.assertFalse(provider.available())
 
 
 class TestRegistry(unittest.TestCase):
