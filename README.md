@@ -16,7 +16,33 @@ standard de Python 3.9+.
   clair/sombre.
 - API JSON (`/api/snapshot`) réutilisable par d'autres outils.
 
-## Installation
+## Démarrage rapide (utilisateur non-technique) 🖱️
+
+**Option A — le `.exe` (Windows, sans rien installer)**
+
+1. Va dans l'onglet **Releases** du dépôt GitHub.
+2. Télécharge **`tempmon.exe`**.
+3. Double-clique dessus → le tableau de bord s'ouvre tout seul dans ton
+   navigateur. C'est tout.
+
+> Le `.exe` est construit automatiquement par GitHub Actions
+> (`.github/workflows/build-exe.yml`). Pour en générer un : crée un tag
+> `v1.0.0` (ou lance le workflow « Build tempmon.exe » à la main).
+
+**Option B — le lanceur double-clic (Windows / Mac / Linux, avec Python)**
+
+Double-clique sur le fichier correspondant à ton système :
+
+| Système  | Fichier                  |
+|----------|--------------------------|
+| Windows  | `Lancer-tempmon.bat`     |
+| macOS    | `Lancer-tempmon.command` |
+| Linux    | `lancer-tempmon.sh`      |
+
+Le navigateur s'ouvre automatiquement sur le tableau de bord. Si Python
+n'est pas installé, le lanceur te l'indique et te donne le lien.
+
+## Installation (développeur)
 
 Rien à installer : clonez le dépôt, Python 3.9+ suffit.
 

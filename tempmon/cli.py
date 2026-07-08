@@ -47,6 +47,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="Rafraîchir en continu dans le terminal.")
     p.add_argument("--serve", action="store_true",
                    help="Lancer le tableau de bord web.")
+    p.add_argument("--open", action="store_true",
+                   help="Ouvrir automatiquement le tableau de bord dans le navigateur.")
     p.add_argument("--interval", type=float, default=DEFAULT_INTERVAL,
                    help=f"Intervalle en secondes (défaut: {DEFAULT_INTERVAL}).")
     p.add_argument("--host", default=DEFAULT_HOST,
@@ -66,7 +68,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.serve:
         from .server import serve
-        serve(args.host, args.port, args.source)
+        serve(args.host, args.port, args.source, open_browser=args.open)
         return 0
 
     provider = build_provider(args.source)

@@ -11,11 +11,24 @@ from __future__ import annotations
 
 import json
 import os
+import sys
+import threading
+import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from .sensors import build_provider
 
-WEB_DIR = os.path.join(os.path.dirname(__file__), "web")
+
+def _web_dir() -> str:
+    # Quand l'appli est packagée avec PyInstaller (.exe), les fichiers
+    # statiques sont extraits dans sys._MEIPASS/tempmon/web.
+    base = getattr(sys, "_MEIPASS", None)
+    if base:
+        return os.path.join(base, "tempmon", "web")
+    return os.path.join(os.path.dirname(__file__), "web")
+
+
+WEB_DIR = _web_dir()
 
 _STATIC = {
     "/": ("index.html", "text/html; charset=utf-8"),
@@ -65,16 +78,25 @@ def make_handler(provider):
     return Handler
 
 
-def serve(host: str, port: int, force_provider: str | None = None) -> None:
+def serve(host: str, port: int, force_provider: str | None = None,
+          open_browser: bool = False) -> None:
     provider = build_provider(force_provider)
     handler = make_handler(provider)
     httpd = ThreadingHTTPServer((host, port), handler)
+    # Sur "0.0.0.0" on ouvre localhost côté navigateur.
+    display_host = "localhost" if host in ("0.0.0.0", "") else host
+    url = f"http://{display_host}:{port}"
     print(f"tempmon : source de capteurs = {provider.name}")
-    print(f"Tableau de bord : http://{host}:{port}")
-    print("Ctrl+C pour arrêter.")
+    print(f"Tableau de bord : {url}")
+    print("Ferme cette fenetre (ou Ctrl+C) pour arreter.")
+
+    if open_browser:
+        # Laisse le serveur démarrer avant d'ouvrir le navigateur.
+        threading.Timer(0.7, lambda: webbrowser.open(url)).start()
+
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\nArrêt.")
+        print("\nArret.")
     finally:
         httpd.server_close()
