@@ -8,6 +8,9 @@ standard de Python 3.9+.
 ## Fonctionnalités
 
 - Lecture des capteurs réels sous Linux via `/sys/class/hwmon`.
+- Sous Windows, repli sur les zones thermiques ACPI (`MSAcpi_ThermalZoneTemperature`
+  via WMI) — moins précis que `hwmon` et pas disponible sur toutes les
+  machines (dépend du firmware).
 - Repli automatique sur `psutil` (si installé) puis sur des données
   **simulées** — le logiciel tourne donc partout (conteneurs, CI, VM).
 - Seuils **par catégorie** de composant (CPU ≠ disque) avec statut
@@ -71,7 +74,7 @@ python3 -m tempmon --once --source simulated
 | `--serve`     | Lance le serveur du tableau de bord web.           |
 | `--interval`  | Intervalle de rafraîchissement en secondes.        |
 | `--host`/`--port` | Adresse d'écoute du serveur.                   |
-| `--source`    | `hwmon`, `psutil` ou `simulated`.                  |
+| `--source`    | `hwmon`, `psutil`, `windows_wmi` ou `simulated`.   |
 | `--no-color`  | Désactive les couleurs ANSI.                       |
 
 ## Architecture
@@ -84,8 +87,9 @@ tempmon/
 │   ├── base.py         # Interface SensorProvider
 │   ├── hwmon.py        # Lecteur Linux réel (/sys/class/hwmon)
 │   ├── psutil_provider.py  # Repli multiplateforme (optionnel)
+│   ├── windows_wmi.py  # Zones thermiques ACPI (Windows, optionnel)
 │   ├── simulated.py    # Données simulées (démo / CI)
-│   └── registry.py     # Auto-détection : hwmon → psutil → simulé
+│   └── registry.py     # Auto-détection : hwmon → psutil → windows_wmi → simulé
 ├── server.py           # Serveur HTTP stdlib : API JSON + statique
 ├── cli.py              # Interface ligne de commande
 └── web/                # Tableau de bord (HTML/CSS/JS)
@@ -108,3 +112,6 @@ python3 -m unittest discover -s tests -v
   noyau (`coretemp`, `k10temp`, `drivetemp`, `nvme`...) sont chargés.
 - Dans un conteneur sans capteurs (comme lors du développement), la source
   `simulated` prend le relais pour permettre la démonstration.
+- Sous Windows, si le firmware n'expose aucune zone thermique ACPI (fréquent
+  sur certaines machines), tempmon retombe aussi sur `simulated` — c'est une
+  limite matérielle/firmware, pas un bug de l'application.
