@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tempmon — Températures des composants</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>🌡️ tempmon</h1>
+    <div class="meta">
+      <span id="source" class="pill">source: …</span>
+      <span id="overall" class="pill">état: …</span>
+      <span id="updated" class="pill muted">màj: …</span>
+    </div>
+  </header>
+
+  <main id="grid" class="grid" aria-live="polite"></main>
+
+  <footer class="footer">
+    <label>Intervalle
+      <select id="interval">
+        <option value="1000">1 s</option>
+        <option value="2000" selected>2 s</option>
+        <option value="5000">5 s</option>
+      </select>
+    </label>
+    <button id="pause">⏸ Pause</button>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
